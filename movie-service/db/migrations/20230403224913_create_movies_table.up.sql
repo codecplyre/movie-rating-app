@@ -1,8 +1,7 @@
+-- Active: 1680618150350@@127.0.0.1@3306@movie_service
 CREATE TABLE IF NOT EXISTS movies (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    release_date DATE,
-    runtime INTEGER,
-    avg_rating DECIMAL(3,2)
+    title VARCHAR(255) NOT NULL UNIQUE,
+    release_date DATE NOT NULL,
+    director VARCHAR(255) NOT NULL
 );

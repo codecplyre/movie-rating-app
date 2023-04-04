@@ -8,27 +8,34 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gorilla/mux"
+	// "github.com/golang-migrate/migrate/v4"
+	// _ "github.com/golang-migrate/migrate/v4/database/sqlite3"
+	// _ "github.com/golang-migrate/migrate/v4/source/file"
+	// "github.com/gorilla/mux"
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "./movies.db")
+	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/movie_service")
 	if err != nil {
 		log.Fatalf("failed to open database connection: %v", err)
 	}
+	// db, err := sql.Open("sqlite3", "./movies.db")
+	// if err != nil {
+	// 	log.Fatalf("failed to open database connection: %v", err)
+	// }
 
-	m, err := migrate.New("file://db/migrations", "sqlite3://movies.db")
-	if err != nil {
-		log.Fatalf("failed to create migrate instance: %v", err)
-	}
+	// m, err := migrate.New("file://db/migrations", "sqlite3://movies.db")
+	// if err != nil {
+	// 	log.Fatalf("failed to create migrate instance: %v", err)
+	// }
 
-	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
-		log.Fatalf("failed to migrate up: %v", err)
-	}
+	// err = m.Up()
+	// if err != nil && err != migrate.ErrNoChange {
+	// 	log.Fatalf("failed to migrate up: %v", err)
+	// }
 
 	fmt.Println("migration successful")
 

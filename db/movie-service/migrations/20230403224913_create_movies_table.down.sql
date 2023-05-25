@@ -1,1 +1,2 @@
+-- Active: 1681326419507@@127.0.0.1@3306@movie
 DROP TABLE IF EXISTS movies;

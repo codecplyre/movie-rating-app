@@ -1,0 +1,24 @@
+services:
+  db:
+    container_name: movie_service_db
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 3306:3306
+  phpMyAdmin:
+    container_name: phpMyAdmin
+    image: phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      PMA_ARBITRARY: 1
+    depends_on:
+      - db
+  api:
+    container_name: movie_service_api
+    build: ./movie-service
+    ports:
+      - 8000:8000
+    depends_on:
+      - db

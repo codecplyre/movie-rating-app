@@ -18,25 +18,12 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/movie_service")
+	db, err := sql.Open("mysql", "root:password@tcp(db:3306)/movie")
 	if err != nil {
 		log.Fatalf("failed to open database connection: %v", err)
 	}
-	// db, err := sql.Open("sqlite3", "./movies.db")
-	// if err != nil {
-	// 	log.Fatalf("failed to open database connection: %v", err)
-	// }
-
-	// m, err := migrate.New("file://db/migrations", "sqlite3://movies.db")
-	// if err != nil {
-	// 	log.Fatalf("failed to create migrate instance: %v", err)
-	// }
-
-	// err = m.Up()
-	// if err != nil && err != migrate.ErrNoChange {
-	// 	log.Fatalf("failed to migrate up: %v", err)
-	// }
-
+	fmt.Println("connected to database")
+	defer db.Close()
 	fmt.Println("migration successful")
 
 	repo := NewMovieRepository(db)
@@ -48,9 +35,36 @@ func main() {
 	r.HandleFunc("/movies", createMovie(service)).Methods("POST")
 	r.HandleFunc("/movies/{id}", updateMovie(service)).Methods("PUT")
 	r.HandleFunc("/movies/{id}", deleteMovie(service)).Methods("DELETE")
+	r.HandleFunc("/movies/generate", GenerateFakeData(service)).Methods("POST")
 
-	log.Println("Server is running on port http://localhost:8000")
+	log.Println("Server is running on port https://localhost:8000")
 	log.Fatal(http.ListenAndServe(":8000", r))
+}
+
+// fake movie data generator for testing and insert into database
+func GenerateFakeData(service MovieService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var movie Movie
+		err := json.NewDecoder(r.Body).Decode(&movie)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		for i := 0; i < 100000; i++ {
+			movie := Movie{
+				Title:       RandomMovie(),
+				ReleaseDate: RandomReleaseDate(),
+				Director:    RandomDirector(),
+			}
+			err = service.CreateMovie(&movie)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		json.NewEncoder(w).Encode(movie)
+	}
 }
 
 func getAllMovies(service MovieService) http.HandlerFunc {
